@@ -9,3 +9,4 @@ tier_cache_db
 .claude
 .gradle
 *.bat
+gradle
