@@ -1,6 +1,6 @@
 # Tier Cache
 
-A three-tier caching system with in-memory cache, repository layer, and persistent disk storage.
+A resilient three-tier caching system designed to **withstand long-duration database outages** while maintaining service availability through in-memory cache, repository layer, and persistent disk storage.
 
 ## Architecture
 
@@ -51,8 +51,9 @@ A three-tier caching system with in-memory cache, repository layer, and persiste
 
 ## Key Features
 
+- **Outage Resilience**: Continue serving cached data during extended database outages
 - **Fast Access**: Cache hits typically <1ms
-- **Automatic Persistence**: Evicted items saved to disk
+- **Automatic Persistence**: Evicted items saved to disk for outage recovery
 - **Thread-Safe**: Handles concurrent access
 - **Graceful Degradation**: Falls back through tiers on failure
 - **Compressed Storage**: RocksDB with compression enabled
@@ -64,6 +65,7 @@ A three-tier caching system with in-memory cache, repository layer, and persiste
 2. **Subsequent**: Cache → fast (<1ms)
 3. **Cache Full**: Evicted items → disk storage
 4. **Cache Miss**: Repository → disk → null
+5. **Database Outage**: Cache → disk → continues serving stale data
 
 ## Dependencies
 
