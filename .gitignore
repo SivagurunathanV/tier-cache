@@ -3,10 +3,14 @@
 
 # Ignore Gradle build output directory
 build
-tier_cache_db
+tier_cache_db/
 *.log
 .vscode
 .claude
-.gradle
 *.bat
-gradle
+build/
+.idea/
+*.iml
+.DS_Store
+*.log
+rocksdb_data/
