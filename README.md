@@ -97,41 +97,49 @@ Cache speedup demonstrated in integration tests:
 
 ## Benchmark Results
 
-╔════════════════════════════════════════════════╗
-║           BENCHMARK RESULTS SUMMARY            ║
-╚════════════════════════════════════════════════╝
+### Summary
 
-## 1. LONG OUTAGE RESILIENCE (~25-min DB outage)
-┌─────────────────────────┬────────┬────────┬────────┬────────┐
-│ Strategy                │  3 min │ 5 min │ 7 min │ 10 min │
-├─────────────────────────┼────────┼────────┼────────┼────────┤
-│ TierCache (Caffeine+RocksDB) │ 100.0% │ 100.0% │ 100.0% │ 100.0% │
-│ EhCache with Disk       │ 100.0% │   0.0% │   0.0% │   0.0% │
-│ Caffeine Only (Baseline) │ 100.0% │   0.0% │   0.0% │   0.0% │
-└─────────────────────────┴────────┴────────┴────────┴────────┘
+**Test Environment**: Long-duration database outage simulation (~25 minutes)
 
-## 2. NORMAL OPERATION PERFORMANCE
-┌─────────────────────────┬──────────────┬──────────────┐
-│ Strategy                │ Cache Hit    │ Cache Miss   │
-├─────────────────────────┼──────────────┼──────────────┤
-│ TierCache (Caffeine+RocksDB) │      2.50 μs │     19.11 μs │
-│ EhCache with Disk       │      6.31 μs │  12042.11 μs │
-│ Caffeine Only (Baseline) │      2.74 μs │  12022.38 μs │
-└─────────────────────────┴──────────────┴──────────────┘
+---
 
-## 3. MEMORY PRESSURE (50K writes, 10K cache size)
-┌─────────────────────────┬──────────────┬──────────────┐
-│ Strategy                │ Total Time   │ Throughput   │
-├─────────────────────────┼──────────────┼──────────────┤
-│ TierCache (Caffeine+RocksDB) │       140 ms │    357143 op/s │
-│ EhCache with Disk       │       201 ms │    248756 op/s │
-│ Caffeine Only (Baseline) │        37 ms │   1351351 op/s │
-└─────────────────────────┴──────────────┴──────────────┘
+### 1. LONG OUTAGE RESILIENCE (~25-min DB outage)
 
-## 4. RECOMMENDATIONS
+| Strategy                          | 3 min  | 5 min  | 7 min  | 10 min |
+|-----------------------------------|--------|--------|--------|--------|
+| TierCache (Caffeine+RocksDB)      | 100.0% | 100.0% | 100.0% | 100.0% |
+| EhCache with Disk                 | 100.0% | 0.0%   | 0.0%   | 0.0%   |
+| Caffeine Only (Baseline)          | 100.0% | 0.0%   | 0.0%   | 0.0%   |
 
-🏆 BEST FOR LONG OUTAGES: TierCache (Caffeine+RocksDB)
-   → Maintains 100.0% availability after 25 minutes
+---
 
-⚡ FASTEST PERFORMANCE: TierCache (Caffeine+RocksDB)
-   → 2.50 μs average latency
+### 2. NORMAL OPERATION PERFORMANCE
+
+| Strategy                          | Cache Hit    | Cache Miss      |
+|-----------------------------------|--------------|-----------------|
+| TierCache (Caffeine+RocksDB)      | 2.50 μs      | 19.11 μs        |
+| EhCache with Disk                 | 6.31 μs      | 12,042.11 μs    |
+| Caffeine Only (Baseline)          | 2.74 μs      | 12,022.38 μs    |
+
+---
+
+### 3. MEMORY PRESSURE (50K writes, 10K cache size)
+
+| Strategy                          | Total Time   | Throughput      |
+|-----------------------------------|--------------|-----------------|
+| TierCache (Caffeine+RocksDB)      | 140 ms       | 357,143 op/s    |
+| EhCache with Disk                 | 201 ms       | 248,756 op/s    |
+| Caffeine Only (Baseline)          | 37 ms        | 1,351,351 op/s  |
+
+---
+
+### 4. KEY TAKEAWAYS
+
+**🏆 Best for Long Outages**: TierCache (Caffeine+RocksDB)
+- Maintains 100.0% availability after 25+ minutes of database outage
+
+**⚡ Fastest Performance**: TierCache (Caffeine+RocksDB)
+- 2.50 μs average latency for cache hits
+- 19.11 μs for cache misses (vs 12ms+ for alternatives)
+
+**💡 Recommendation**: TierCache provides the best balance of outage resilience and performance for production systems requiring high availability during database failures.
