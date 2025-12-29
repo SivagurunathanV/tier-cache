@@ -29,6 +29,14 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
     implementation("org.rocksdb:rocksdbjni:8.11.3")
     implementation("com.esotericsoftware:kryo:5.5.0") // for serialization/deserialization
+
+     // Add for benchmarking
+    implementation("org.ehcache:ehcache:3.10.8")
+    implementation("org.openjdk.jmh:jmh-core:1.37")
+    annotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
+    
+    // Metrics
+    implementation("io.dropwizard.metrics:metrics-core:4.2.19")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -52,4 +60,19 @@ tasks.named<Test>("test") {
         "-Djava.library.path=/opt/homebrew/lib:${System.getProperty("java.library.path")}",
         "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
     )
+}
+
+sourceSets {
+    create("jmh") {
+        java.srcDir("src/jmh/java")
+        compileClasspath += sourceSets["main"].runtimeClasspath
+        runtimeClasspath += sourceSets["main"].runtimeClasspath
+    }
+}
+
+tasks.register<JavaExec>("runBenchmark") {
+    group = "benchmark"
+    classpath = sourceSets["jmh"].runtimeClasspath + sourceSets["main"].runtimeClasspath
+    mainClass.set("tier_cache.benchmark.BenchmarkRunner")
+    dependsOn("compileJmhJava")
 }

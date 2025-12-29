@@ -10,6 +10,7 @@ public class DatabaseRepository<T> implements Repository<T> {
     private Map<Object, T> database;
     private final long minDelayMs;
     private final long maxDelayMs;
+    private boolean isAvailable = true;
 
     public DatabaseRepository() {
         this(100, 1000); // Default: 100ms to 1 second delay
@@ -23,6 +24,9 @@ public class DatabaseRepository<T> implements Repository<T> {
 
     @Override
     public T findByKey(Object key) {
+        if (!isAvailable) {
+            return null; // Changed from throw exception
+        }
         return executeWithDelay(() -> database.get(key));
     }
 
@@ -52,6 +56,14 @@ public class DatabaseRepository<T> implements Repository<T> {
     @Override
     public void close() {
         this.database.clear();
+    }
+
+    public void simulateOutage() {
+        isAvailable = false;
+    }
+
+    public void restoreDatabase() {
+        isAvailable = true;
     }
     
 }

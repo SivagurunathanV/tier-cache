@@ -21,6 +21,17 @@ public class CacheStore<K, V, T> implements AutoCloseable {
                 })
                 .build();
     }
+    public CacheStore(Diskstore diskStore, Repository<T> repository, long maxSize, Duration ttl) {
+        this.diskStore = diskStore;
+        this.repository = repository;
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(maxSize)
+                .expireAfterWrite(ttl)
+                .evictionListener((key, value, cause) ->  {
+                    this.diskStore.save(key, value);
+                })
+                .build();
+    }
 
     // returns null if the key not present in cache, database repo and disk
     @SuppressWarnings("unchecked")
